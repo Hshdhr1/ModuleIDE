@@ -1,0 +1,158 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    android:versionCode="113"
+    android:versionName="1.0.2 Beta"
+    android:compileSdkVersion="33"
+    android:compileSdkVersionCodename="13"
+    package="ru.yufic.exteraPlugins"
+    platformBuildVersionCode="33"
+    platformBuildVersionName="13">
+    <uses-sdk
+        android:minSdkVersion="21"
+        android:targetSdkVersion="34"/>
+    <uses-permission android:name="android.permission.INTERNET"/>
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
+    <uses-permission android:name="android.permission.MANAGE_EXTERNAL_STORAGE"/>
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
+    <application
+        android:theme="@style/AppTheme"
+        android:label="@string/app_name"
+        android:icon="@mipmap/ic_launcher"
+        android:name="ru.yufic.exteraPlugins.SketchApplication"
+        android:allowBackup="true"
+        android:usesCleartextTraffic="true"
+        android:requestLegacyExternalStorage="true">
+        <activity
+            android:name="ru.yufic.exteraPlugins.MainActivity"
+            android:configChanges="smallestScreenSize|screenSize|screenLayout|orientation|keyboardHidden"
+            android:hardwareAccelerated="true"
+            android:supportsPictureInPicture="true"/>
+        <activity
+            android:theme="@style/AppTheme"
+            android:name="ru.yufic.exteraPlugins.CreateActivity"
+            android:exported="true"
+            android:screenOrientation="portrait"
+            android:configChanges="smallestScreenSize|screenSize|screenLayout|orientation|keyboardHidden"
+            android:windowSoftInputMode="stateHidden"
+            android:hardwareAccelerated="true"
+            android:supportsPictureInPicture="true">
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW"/>
+                <category android:name="android.intent.category.DEFAULT"/>
+                <category android:name="android.intent.category.BROWSABLE"/>
+                <data
+                    android:scheme="file"
+                    android:host="*"
+                    android:pathPattern=".*\\.plugin"/>
+                <data
+                    android:scheme="file"
+                    android:host="*"
+                    android:pathPattern=".*\\.py"/>
+                <data
+                    android:mimeType="*/*"
+                    android:scheme="content"
+                    android:pathPattern=".*\\.plugin"/>
+                <data
+                    android:mimeType="*/*"
+                    android:scheme="content"
+                    android:pathPattern=".*\\.py"/>
+            </intent-filter>
+        </activity>
+        <activity
+            android:name="ru.yufic.exteraPlugins.EditActivity"
+            android:configChanges="smallestScreenSize|screenSize|screenLayout|orientation|keyboardHidden"
+            android:hardwareAccelerated="true"
+            android:supportsPictureInPicture="true"/>
+        <activity
+            android:name="ru.yufic.exteraPlugins.VersionsControlActivity"
+            android:configChanges="smallestScreenSize|screenSize|screenLayout|orientation|keyboardHidden"
+            android:hardwareAccelerated="true"
+            android:supportsPictureInPicture="true"/>
+        <activity
+            android:theme="@style/AppTheme"
+            android:name="ru.yufic.exteraPlugins.SettingsActivity"
+            android:exported="true"
+            android:screenOrientation="portrait"
+            android:configChanges="smallestScreenSize|screenSize|screenLayout|orientation|keyboardHidden"
+            android:windowSoftInputMode="stateHidden"
+            android:hardwareAccelerated="true"
+            android:supportsPictureInPicture="true">
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW"/>
+                <category android:name="android.intent.category.DEFAULT"/>
+                <category android:name="android.intent.category.BROWSABLE"/>
+                <data
+                    android:scheme="file"
+                    android:pathPattern=".*\\.piex"/>
+                <data
+                    android:mimeType="application/octet-stream"
+                    android:scheme="content"
+                    android:pathPattern=".*\\.piex"/>
+            </intent-filter>
+        </activity>
+        <activity
+            android:name="ru.yufic.exteraPlugins.DebugActivity"
+            android:configChanges="smallestScreenSize|screenSize|screenLayout|orientation|keyboardHidden"
+            android:hardwareAccelerated="true"
+            android:supportsPictureInPicture="true"/>
+        <activity
+            android:name="ru.yufic.exteraPlugins.SplashActivity"
+            android:exported="true"
+            android:configChanges="smallestScreenSize|screenSize|screenLayout|orientation|keyboardHidden"
+            android:windowSoftInputMode="stateHidden"
+            android:hardwareAccelerated="true"
+            android:supportsPictureInPicture="true">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN"/>
+                <category android:name="android.intent.category.LAUNCHER"/>
+            </intent-filter>
+        </activity>
+        <activity
+            android:name="ru.yufic.exteraPlugins.IconsActivity"
+            android:configChanges="smallestScreenSize|screenSize|screenLayout|orientation|keyboardHidden"
+            android:windowSoftInputMode="stateHidden"
+            android:hardwareAccelerated="true"
+            android:supportsPictureInPicture="true"/>
+        <activity
+            android:name="ru.yufic.exteraPlugins.TempActivity"
+            android:configChanges="smallestScreenSize|screenSize|screenLayout|orientation|keyboardHidden"
+            android:hardwareAccelerated="true"
+            android:supportsPictureInPicture="true"/>
+        <activity
+            android:name="ru.yufic.exteraPlugins.DocumActivity"
+            android:configChanges="smallestScreenSize|screenSize|screenLayout|orientation|keyboardHidden"
+            android:hardwareAccelerated="true"
+            android:supportsPictureInPicture="true"/>
+        <activity
+            android:name="ru.yufic.exteraPlugins.ChatActivity"
+            android:configChanges="smallestScreenSize|screenSize|screenLayout|orientation|keyboardHidden"
+            android:hardwareAccelerated="true"
+            android:supportsPictureInPicture="true"/>
+        <provider
+            android:name="androidx.startup.InitializationProvider"
+            android:exported="false"
+            android:authorities="ru.yufic.exteraPlugins.androidx-startup">
+            <meta-data
+                android:name="androidx.lifecycle.ProcessLifecycleInitializer"
+                android:value="androidx.startup"/>
+            <meta-data
+                android:name="androidx.emoji2.text.EmojiCompatInitializer"
+                android:value="androidx.startup"/>
+        </provider>
+        <uses-library
+            android:name="org.apache.http.legacy"
+            android:required="false"/>
+        <provider
+            android:name="androidx.core.content.FileProvider"
+            android:exported="false"
+            android:authorities="ru.yufic.exteraPlugins.provider"
+            android:grantUriPermissions="true">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/file_paths"/>
+        </provider>
+    </application>
+</manifest>

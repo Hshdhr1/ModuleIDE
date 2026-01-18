@@ -1,0 +1,94 @@
+<!-- markdown-utils.html -->
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Markdown Utilities · Документация</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <nav class="toc">
+    <h2>Содержание</h2>
+    <ul>
+      <li><a href="#intro">Введение</a></li>
+      <li><a href="#core">Основные компоненты</a></li>
+      <li><a href="#types">Поддерживаемые типы</a></li>
+      <li><a href="#example">Пример использования</a></li>
+      <li><a href="#notes">Важно знать</a></li>
+    </ul>
+  </nav>
+
+  <main>
+    <h1 id="intro">Введение</h1>
+    <p>
+      Модуль <code>markdown_utils</code> позволяет парсить текст в стиле Markdown V2 и преобразовывать его в обычную строку с набором сущностей <code>TLRPC.MessageEntity</code> — готовых для отправки через Telegram API.
+    </p>
+
+    <h1 id="core">Основные компоненты</h1>
+    <p>Функция <code>parse_markdown</code> возвращает объект <code>ParsedMessage</code> с двумя атрибутами:</p>
+    <ul>
+      <li><code>text: str</code> — текст без маркеров форматирования.</li>
+      <li><code>entities: Tuple&lt;RawEntity,…&gt;</code> — кортеж объектов <code>RawEntity</code>, описывающих формат.</li>
+    </ul>
+    <p>У каждого <code>RawEntity</code> есть:</p>
+    <ul>
+      <li><code>type</code> — вид (жирный, курсив, код и т. д.).</li>
+      <li><code>offset</code> и <code>length</code> — позиция и длина в UTF‑16 (Telegram требует именно этот формат).</li>
+      <li>Дополнительно: <code>language</code> (для блока кода), <code>url</code> (для ссылок), <code>document_id</code> (для кастомных эмодзи).</li>
+    </ul>
+    <p>Для конвертации <code>RawEntity</code> в `TLRPC.MessageEntity` используйте метод <code>to_tlrpc_object()</code>.</p>
+
+    <h1 id="types">Поддерживаемые типы форматирования</h1>
+    <ul>
+      <li><code>BOLD</code> (`*жирный*`)</li>
+      <li><code>ITALIC</code> (`_курсив_`)</li>
+      <li><code>UNDERLINE</code> (`__подчёркнутый__`)</li>
+      <li><code>STRIKETHROUGH</code> (`~перечёркнутый~`)</li>
+      <li><code>SPOILER</code> (`||спойлер||`)</li>
+      <li><code>CODE</code> (код в тексте, `` `код` ``)</li>
+      <li><code>PRE</code> (блок кода, ```), с опциональной подсветкой языка</li>
+      <li><code>TEXT_LINK</code> (`[текст](https://...)`)</li>
+      <li><code>CUSTOM_EMOJI</code> (`[эмодзи](document_id)`)</li>
+    </ul>
+
+    <h1 id="example">Пример использования</h1>
+    <pre><code>from client_utils import send_message
+from markdown_utils import parse_markdown
+from android_utils import log
+
+params = {"peer": 12345678, "entities": []}
+text = (
+  "*Жирный* _курсив_ __подчёркнутый__\n"
+  "`код` и [ссылка](https://example.com)\n"
+  "Custom emoji: \n\n"
+  "```python\nprint('Hello')\n```"
+)
+
+try:
+  msg = parse_markdown(text)
+  params["message"] = msg.text
+  params["entities"] = [e.to_tlrpc_object() for e in msg.entities]
+  log(f"Отправляю: {params['message']} с {len(msg.entities)} сущностями")
+  send_message(params)
+except SyntaxError as e:
+  log(f"Ошибка синтаксиса Markdown: {e}")
+</code></pre>
+
+    <h1 id="notes">Важно знать</h1>
+    <ul>
+      <li>Смещение (<code>offset</code>) и длина — в UTF‑16 символах.</li>
+      <li>Нарушение синтаксиса вызывает <code>SyntaxError</code>.</li>
+      <li>Поддерживается базовое вложение стилей, но сложные комбинации могут работать некорректно.</li>
+      <li>Символы Markdown можно экранировать с помощью `\`, если нужно сохранить их в тексте.</li>
+      <li>Блоки кода:
+        <ul>
+          <li>Inline: один обратный апостроф <code>`код`</code></li>
+          <li>Fenced: три обратных апострофа <code>```</code>, можно указать язык</li>
+        </ul>
+      </li>
+      <li>Кастомные эмодзи: используйте синтаксис `[текст](document_id)`; ID можно получить через @AdsMarkdownBot в Telegram.</li>
+    </ul>
+  </main>
+</body>
+</html>

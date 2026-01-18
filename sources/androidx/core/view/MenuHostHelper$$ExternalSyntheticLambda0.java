@@ -1,0 +1,20 @@
+package androidx.core.view;
+
+import androidx.lifecycle.Lifecycle;
+import androidx.lifecycle.LifecycleEventObserver;
+import androidx.lifecycle.LifecycleOwner;
+
+/* loaded from: /storage/emulated/0/Android/data/com.apktools.app.decompile/files/decompile_temp/jadx/classes6.dex */
+public final /* synthetic */ class MenuHostHelper$$ExternalSyntheticLambda0 implements LifecycleEventObserver {
+    public final /* synthetic */ MenuHostHelper f$0;
+    public final /* synthetic */ MenuProvider f$1;
+
+    public /* synthetic */ MenuHostHelper$$ExternalSyntheticLambda0(MenuHostHelper menuHostHelper, MenuProvider menuProvider) {
+        this.f$0 = menuHostHelper;
+        this.f$1 = menuProvider;
+    }
+
+    public final void onStateChanged(LifecycleOwner lifecycleOwner, Lifecycle.Event event) {
+        this.f$0.lambda$addMenuProvider$0$MenuHostHelper(this.f$1, lifecycleOwner, event);
+    }
+}

@@ -1,0 +1,118 @@
+<!-- bulletin-helper.html -->
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>BulletinHelper · Документация</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <nav class="toc">
+    <h2>Содержание</h2>
+    <ul>
+      <li><a href="#intro">Введение</a></li>
+      <li><a href="#basic">Простое использование</a></li>
+      <li><a href="#types">Типы Bulletin</a></li>
+      <li><a href="#custom">Настраиваемые уведомления</a></li>
+      <li><a href="#actions">Bulletins с действиями</a></li>
+      <li><a href="#contextual">Контекстные уведомления</a></li>
+      <li><a href="#durations">Длительность</a></li>
+      <li><a href="#lottie">Lottie-анимации (иконки)</a></li>
+    </ul>
+  </nav>
+
+  <main>
+    <h1 id="intro">Введение</h1>
+    <p>
+      Класс <code>BulletinHelper</code> (в файле <code>bulletin.py</code>) предоставляет статические методы для удобного отображения неблокирующих нижних уведомлений (bulletins) в стиле Telegram :contentReference[oaicite:1]{index=1}.
+    </p>
+
+    <h1 id="basic">Простое использование</h1>
+    <pre><code>from ui.bulletin import BulletinHelper
+from client_utils import get_last_fragment
+
+fragment = get_last_fragment()
+
+BulletinHelper.show_info("Информационное сообщение", fragment)
+BulletinHelper.show_error("Произошла ошибка", fragment)
+BulletinHelper.show_success("Успешно завершено", fragment)
+</code></pre>
+    <p>Если <code>fragment</code> не передан, используется текущий активный фрагмент :contentReference[oaicite:2]{index=2}.</p>
+
+    <h1 id="types">Типы Bulletin</h1>
+    <ul>
+      <li><code>show_info</code> — с иконкой информации;</li>
+      <li><code>show_error</code> — с иконкой ошибки;</li>
+      <li><code>show_success</code> — с иконкой успеха.</li>
+    </ul>
+    <p>Все автоматизируют вызов на UI-потоке :contentReference[oaicite:3]{index=3}.</p>
+
+    <h1 id="custom">Настраиваемые уведомления</h1>
+    <pre><code>from org.telegram.messenger import R as R_tg
+
+BulletinHelper.show_simple(
+  "Процесс...",
+  R_tg.raw.timer,
+  fragment
+)
+
+BulletinHelper.show_two_line(
+  "Загрузка завершена",
+  "Сохранено в галерею",
+  R_tg.raw.ic_download_done,
+  fragment
+)
+</code></pre>
+
+    <h1 id="actions">Bulletins с действиями</h1>
+    <pre><code>def open_settings():
+    print("Нажата кнопка Настройки")
+
+BulletinHelper.show_with_button(
+  "Настройки обновлены",
+  R_tg.raw.info,
+  "Настроить",
+  open_settings,
+  fragment,
+  duration=BulletinHelper.DURATION_PROLONG
+)
+</code></pre>
+    <p>Метод <code>show_with_button</code> принимает текст, иконку, текст кнопки, обработчик нажатия и длительность :contentReference[oaicite:4]{index=4}.</p>
+
+    <pre><code>def on_undo():
+    print("Откат выполнен")
+
+def on_commit():
+    print("Действие подтверждено")
+
+BulletinHelper.show_undo(
+  "Элемент перемещён в корзину",
+  on_undo=on_undo,
+  on_action=on_commit,
+  subtitle=None,
+  fragment=fragment
+)
+</code></pre>
+
+    <h1 id="contextual">Контекстные уведомления</h1>
+    <ul>
+      <li><code>show_copied_to_clipboard(message=None)</code> — показывает "Скопировано в буфер";</li>
+      <li><code>show_link_copied(is_private_link_info=False)</code> — уведомляет об копировании ссылки;</li>
+      <li><code>show_file_saved_to_gallery(is_video=False, amount=1)</code> — файл сохранён в галерею;</li>
+      <li><code>show_file_saved_to_downloads(file_type_enum_name="UNKNOWN", amount=1)</code> — файл сохранён в загрузки :contentReference[oaicite:5]{index=5}.</li>
+    </ul>
+
+    <h1 id="durations">Длительность</h1>
+    <p>Доступны константы времени отображения ⏱️:</p>
+    <ul>
+      <li><code>DURATION_SHORT</code>: 1500 мс</li>
+      <li><code>DURATION_LONG</code>: 2750 мс</li>
+      <li><code>DURATION_PROLONG</code>: 5000 мс</li>
+    </ul>
+
+    <h1 id="lottie">Lottie-анимации (иконки)</h1>
+    <p>Чтобы использовать иконки, передавайте ресурс из `org.telegram.messenger.R.raw`. Например, `R_tg.raw.info`, `timer`, `success` и др. Они хранятся в папке `res/raw` у Telegram :contentReference[oaicite:6]{index=6}.</p>
+  </main>
+</body>
+</html>

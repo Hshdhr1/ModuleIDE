@@ -1,0 +1,19 @@
+package androidx.core.location;
+
+import androidx.core.location.LocationManagerCompat;
+import java.util.concurrent.Executor;
+
+/* loaded from: /storage/emulated/0/Android/data/com.apktools.app.decompile/files/decompile_temp/jadx/classes6.dex */
+public final /* synthetic */ class LocationManagerCompat$PreRGnssStatusTransport$$ExternalSyntheticLambda0 implements Runnable {
+    public final /* synthetic */ LocationManagerCompat.PreRGnssStatusTransport f$0;
+    public final /* synthetic */ Executor f$1;
+
+    public /* synthetic */ LocationManagerCompat$PreRGnssStatusTransport$$ExternalSyntheticLambda0(LocationManagerCompat.PreRGnssStatusTransport preRGnssStatusTransport, Executor executor) {
+        this.f$0 = preRGnssStatusTransport;
+        this.f$1 = executor;
+    }
+
+    public final void run() {
+        this.f$0.lambda$onStarted$0$LocationManagerCompat$PreRGnssStatusTransport(this.f$1);
+    }
+}

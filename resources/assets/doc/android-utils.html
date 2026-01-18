@@ -1,0 +1,108 @@
+<!-- android-utils.html -->
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Android Utilities · Документация</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <nav class="toc">
+    <h2>Содержание</h2>
+    <ul>
+      <li><a href="#intro">Введение</a></li>
+      <li><a href="#wrappers">Оболочки для Java-интерфейсов</a></li>
+      <li><a href="#runnable">R (Runnable Proxy)</a></li>
+      <li><a href="#onclick">OnClickListener</a></li>
+      <li><a href="#onlongclick">OnLongClickListener</a></li>
+      <li><a href="#utils">Утилитные функции</a></li>
+      <li><a href="#run_on_ui_thread">run_on_ui_thread</a></li>
+      <li><a href="#log">log</a></li>
+    </ul>
+  </nav>
+
+  <main>
+    <h1 id="intro">Введение</h1>
+    <p>
+      Модуль <code>android_utils</code> предоставляет вспомогательные классы и функции для работы с Android UI, выполнения кода в UI‑потоке и логирования.
+    </p>
+
+    <h1 id="wrappers">Оболочки для Java‑интерфейсов</h1>
+    <p>Эти классы служат Python‑прокси для типичных Java функциональных интерфейсов и особенно полезны для назначения слушателей событий.</p>
+
+    <h2 id="runnable">R (Runnable Proxy)</h2>
+    <p>
+      Класс‑прокси для Java‑интерфейса <code>java.lang.Runnable</code>. Обычно используется с <code>run_on_ui_thread</code> или передаётся в методы, ожидающие Runnable.
+    </p>
+    <pre><code>from android_utils import R, log, run_on_ui_thread
+
+def my_task():
+    print("Задача выполнена.")
+
+runnable_instance = R(my_task)
+run_on_ui_thread(lambda: log("Runnable lambda вызван!"))</code></pre>
+
+    <h2 id="onclick">OnClickListener</h2>
+    <p>
+      Динамическое прокси для <code>android.view.View.OnClickListener</code>. Упрощает установку обработчиков клика из Python.
+    </p>
+    <pre><code>from android_utils import OnClickListener, log
+
+def handle_button_click():
+    log("Кнопка нажата!")
+
+button.setOnClickListener(OnClickListener(handle_button_click))</code></pre>
+
+    <h2 id="onlongclick">OnLongClickListener</h2>
+    <p>
+      Прокси для <code>android.view.View.OnLongClickListener</code>, обрабатывает долгие нажатия.
+    </p>
+    <pre><code>from android_utils import OnLongClickListener, log
+
+def handle_button_long_click():
+    log("Долгое нажатие!")
+    return True
+
+button.setOnLongClickListener(OnLongClickListener(handle_button_long_click))</code></pre>
+    <p>Функция должна вернуть <code>True</code>, если событие обработано, иначе <code>False</code>.</p>
+
+    <h1 id="utils">Утилитные функции</h1>
+
+    <h2 id="run_on_ui_thread">run_on_ui_thread</h2>
+    <p>Запускает Python‑функцию в основном потоке UI — необходимо для всех действий с интерфейсом.</p>
+    <pre><code>from android_utils import run_on_ui_thread
+
+def update_ui():
+    text_view.setText("Обновлено из Python!")
+
+run_on_ui_thread(update_ui)
+run_on_ui_thread(update_ui, 500)  # с задержкой 500 мс</code></pre>
+    <p>Аргументы:</p>
+    <ul>
+      <li><code>func</code> — вызываемый объект Python;</li>
+      <li><code>delay</code> (необязательно) — задержка в мс перед исполнением (по умолчанию 0).</li>
+    </ul>
+
+    <h2 id="log">log</h2>
+    <p>Универсальная функция логирования в logcat. Удобна при работе с adb logcat или Android Studio.</p>
+    <p>— Примитивные типы (<code>str/int/bool/None</code>) выводятся напрямую;<br>
+    — Сложные объекты (например, список, dict или Java‑объект) выводятся в виде JSON‑структуры.</p>
+    <pre><code>from android_utils import log
+
+log("Просто сообщение")
+log(f"Число: {123}")
+log(True)
+
+log(user_object)  # подробный дамп объекта
+log([1,2,3])      # детали списка
+
+try:
+    1/0
+except Exception as e:
+    import traceback
+    log(f"Ошибка: {e}")
+    log(traceback.format_exc())</code></pre>
+  </main>
+</body>
+</html>

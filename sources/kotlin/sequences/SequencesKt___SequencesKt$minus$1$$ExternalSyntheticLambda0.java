@@ -1,0 +1,23 @@
+package kotlin.sequences;
+
+import com.android.tools.r8.annotations.SynthesizedClassV2;
+import kotlin.jvm.functions.Function1;
+import kotlin.jvm.internal.Ref;
+import kotlin.sequences.SequencesKt___SequencesKt;
+
+/* compiled from: D8$$SyntheticClass */
+@SynthesizedClassV2(apiLevel = -2, kind = 18, versionHash = "58e1befcef90c64cc6d403d58c95352586f3f4919e4e23215f3f69a97b1a49c4")
+/* loaded from: /storage/emulated/0/Android/data/com.apktools.app.decompile/files/decompile_temp/jadx/classes62.dex */
+public final /* synthetic */ class SequencesKt___SequencesKt$minus$1$$ExternalSyntheticLambda0 implements Function1 {
+    public final /* synthetic */ Ref.BooleanRef f$0;
+    public final /* synthetic */ Object f$1;
+
+    public /* synthetic */ SequencesKt___SequencesKt$minus$1$$ExternalSyntheticLambda0(Ref.BooleanRef booleanRef, Object obj) {
+        this.f$0 = booleanRef;
+        this.f$1 = obj;
+    }
+
+    public final Object invoke(Object obj) {
+        return Boolean.valueOf(SequencesKt___SequencesKt.1.$r8$lambda$kf-elBx0XPvFF6WPI5Hkv1SiMqI(this.f$0, this.f$1, obj));
+    }
+}

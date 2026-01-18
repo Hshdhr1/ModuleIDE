@@ -1,0 +1,117 @@
+/* общий сброс */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html, body {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  min-height: 100%;
+  background: transparent;
+  font-family: sans-serif;
+  color: var(--text-color);
+}
+
+/* корневая палитра */
+:root {
+  --bg-color: rgba(255,255,255,0.9);
+  --text-color: #000;
+  --code-bg: rgba(0,0,0,0.05);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg-color: rgba(0,0,0,0.9);
+    --text-color: #fff;
+    --code-bg: rgba(255,255,255,0.1);
+  }
+}
+
+body {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  background: var(--bg-color);
+}
+
+/* навигация */
+.toc {
+  background: var(--bg-color);
+  padding: 1rem;
+  border-bottom: 1px solid var(--text-color);
+  width: 100%;
+}
+
+/* содержимое меню */
+.toc h2 {
+  margin-top: 0;
+}
+.toc ul {
+  padding: 0;
+  margin: 0;
+  list-style: none;
+}
+.toc li + li {
+  margin-top: 0.5rem;
+}
+
+/* основной контент */
+main {
+  flex: 1;
+  padding: 1rem;
+  background: var(--bg-color);
+}
+
+/* ссылки и код */
+a {
+  color: inherit;
+  text-decoration: underline;
+}
+code {
+  font-family: monospace;
+  background: var(--code-bg);
+  padding: 0.2em 0.4em;
+  border-radius: 4px;
+  word-break: break-word;
+}
+pre {
+  background: var(--code-bg);
+  padding: 1rem;
+  overflow-x: auto;
+  border-radius: 4px;
+  font-size: 0.9em;
+}
+
+/* заголовки */
+h1, h2 {
+  margin-top: 1.5rem;
+  line-height: 1.2;
+}
+
+/* планшеты и выше: две колонки */
+@media (min-width: 768px) {
+  body {
+    flex-direction: row;
+  }
+
+  /* фиксируем меню слева */
+  .toc {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 220px;
+    height: 100vh;
+    overflow-y: auto;
+    border-right: 1px solid var(--text-color);
+    border-bottom: none;
+  }
+
+  /* контент занимает остаток экрана */
+  main {
+    margin-left: 220px;
+    max-width: calc(100% - 220px);
+  }
+}

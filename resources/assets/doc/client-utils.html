@@ -1,0 +1,97 @@
+<!-- client-utils.html -->
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Client Utilities · Документация</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <nav class="toc">
+    <h2>Содержание</h2>
+    <ul>
+      <li><a href="#intro">Введение</a></li>
+      <li><a href="#queues">Очереди (фоновые потоки)</a></li>
+      <li><a href="#api-requests">API‑запросы Telegram</a></li>
+      <li><a href="#send-message">Отправка сообщений</a></li>
+      <li><a href="#bulletins">Bulletins (нижние уведомления)</a></li>
+      <li><a href="#controllers">Контроллеры и менеджеры</a></li>
+    </ul>
+  </nav>
+
+  <main>
+    <h1 id="intro">Введение</h1>
+    <p>Модуль <code>client_utils</code> предоставляет утилиты для фоновых задач, работы с Telegram API, отправки сообщений и отображения уведомлений (bulletins) :contentReference[oaicite:1]{index=1}.</p>
+
+    <h1 id="queues">Очереди (фоновые потоки)</h1>
+    <p>Для выполнения длительных операций без блокировки UI используйте <code>run_on_queue</code>:</p>
+    <pre><code>from client_utils import run_on_queue, GLOBAL_QUEUE
+from android_utils import log
+
+def task(param):
+    log(f"Task started: {param}")
+    # долгий процесс
+    log(f"Task finished: {param}")
+
+run_on_queue(lambda: task("data"))  # по умолчанию в PLUGINS_QUEUE
+run_on_queue(lambda: task("more"), GLOBAL_QUEUE, 2500)  # с задержкой 2.5 сек
+</code></pre>
+    <p>Доступные очереди: <code>STAGE_QUEUE</code>, <code>GLOBAL_QUEUE</code>, <code>CACHE_CLEAR_QUEUE</code>, <code>SEARCH_QUEUE</code>, <code>PHONE_BOOK_QUEUE</code>, <code>THEME_QUEUE</code>, <code>EXTERNAL_NETWORK_QUEUE</code>, <code>PLUGINS_QUEUE</code> по умолчанию :contentReference[oaicite:2]{index=2}.</p>
+
+    <h1 id="api-requests">API‑запросы Telegram</h1>
+    <p>Для отправки низкоуровневых TL‑запросов используйте <code>send_request</code> с прокси <code>RequestCallback</code>:</p>
+    <pre><code>from client_utils import send_request, RequestCallback
+from org.telegram.tgnet import TLRPC
+from android_utils import log
+from java.lang import Integer
+
+def cb(resp, err):
+    if err:
+        log(f"Ошибка: {err.text}")
+    else:
+        log(f"Ответ получен: {type(resp)}")
+
+req = TLRPC.TL_messages_readMessageContents()
+req.id.add(Integer(12345))
+callback = RequestCallback(cb)
+send_request(req, callback)
+</code></pre>:contentReference[oaicite:3]{index=3}
+
+    <h1 id="send-message">Отправка сообщений</h1>
+    <p>Упрощённая отправка сообщений через <code>send_message</code>, не требует запуска в UI‑потоке:</p>
+    <pre><code>from client_utils import send_message
+
+params = {
+  "peer": 12345678,
+  "message": "Привет из плагина!"
+}
+send_message(params)
+</code></pre>:contentReference[oaicite:4]{index=4}
+
+    <h1 id="bulletins">Bulletins (нижние уведомления)</h1>
+    <p>Используйте <code>BulletinHelper</code> для показа коротких уведомлений:</p>
+    <pre><code>from ui.bulletin import BulletinHelper
+BulletinHelper.show_info("Информационное уведомление")
+</code></pre>:contentReference[oaicite:5]{index=5}
+
+    <h1 id="controllers">Контроллеры и менеджеры</h1>
+    <p>Доступны утилиты для получения внутренних контроллеров клиента:</p>
+    <pre><code>from client_utils import (
+  get_messages_controller,
+  get_connections_manager,
+  get_send_messages_helper,
+  get_user_config
+)
+
+mc = get_messages_controller()
+cm = get_connections_manager()
+smh = get_send_messages_helper()
+uc = get_user_config()
+
+if uc.getCurrentUser():
+    print("User:", uc.getCurrentUser().first_name)
+</code></pre>:contentReference[oaicite:6]{index=6}
+  </main>
+</body>
+</html>

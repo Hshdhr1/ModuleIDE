@@ -1,0 +1,122 @@
+<!-- index.html -->
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Первый плагин exteraGram</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <nav class="toc">
+    <h2>Содержание</h2>
+    <ul>
+      <li><a href="#before-start">Прежде чем начать</a></li>
+      <li><a href="#structure">Основная структура плагина</a></li>
+      <li><a href="#simple-plugin">Создание простого плагина Weather</a></li>
+      <li><a href="#network-format">Сетевая часть и форматирование</a></li>
+      <li><a href="#hook">Перехват отправки сообщения</a></li>
+    </ul>
+  </nav>
+
+  <main>
+    <h1 id="before-start">Прежде чем начать</h1>
+    <p>Рекомендуется ознакомиться с документацией "Класс плагина" и держать её под рукой во время разработки.</p>
+
+    <h1 id="structure">Основная структура плагина</h1>
+    <p>Все файлы с расширением <code>.plugin</code> должны содержать две части:</p>
+    <ol>
+      <li>Метаданные (ID, имя, описание, автор, версия и т.д.)</li>
+      <li>Класс, наследующийся от <code>BasePlugin</code></li>
+    </ol>
+    <p><strong>Примечание по метаданным:</strong> версию плагина можно создать прямо в редакторе и при необходимости удалить через менеджер версий. Имя, описание и автор задаются в редакторе версий (кнопка “Редактировать” внутри редактора), а ID плагина можно менять в списке проектов.</p>
+
+    <h1 id="simple-plugin">Создание простого плагина Weather</h1>
+    <p>В этом примере плагин отвечает на команды, начинающиеся с <code>.wt</code>, и возвращает информацию о погоде.</p>
+    <p>Будем использовать API <a href="https://wttr.in" target="_blank">wttr.in</a>.</p>
+
+    <h2 id="network-format">Сетевая часть и форматирование</h2>
+    <p>Добавим функции для получения данных и их форматирования:</p>
+    <pre><code>import requests
+from android_utils import log
+
+API_BASE_URL = "https://wttr.in"
+API_HEADERS = {
+  "User-Agent": "Mozilla/5.0",
+  "Accept": "application/json"
+}
+
+def fetch_weather_data(city: str):
+    try:
+        url = f"{API_BASE_URL}/{city}?format=j1"
+        response = requests.get(url, headers=API_HEADERS, timeout=10)
+        if response.status_code != 200:
+            log(f"Не удалось получить данные о погоде для «{city}» (код {response.status_code})")
+            return None
+        return response.json()
+    except Exception as e:
+        log(f"Ошибка Weather API: {e}")
+        return None
+
+def format_weather_data(data: dict, query_city: str) -> str:
+    try:
+        area = data.get("nearest_area", [{}])[0]
+        city = area.get("areaName", [{}])[0].get("value", query_city)
+        region = area.get("region", [{}])[0].get("value", "")
+        country = area.get("country", [{}])[0].get("value", "")
+        location = ", ".join(filter(None, [city, region, country]))
+
+        current = data["current_condition"][0]
+        temp = current.get("temp_C", "N/A")
+        feels = current.get("FeelsLikeC", "N/A")
+        cond = current.get("weatherDesc", [{}])[0].get("value", "Неизвестно")
+        hum = current.get("humidity", "N/A")
+        wind = f"{current.get('windspeedKmph','N/A')} км/ч ({current.get('winddir16Point','N/A')})"
+        time = current.get("localObsDateTime", "N/A")
+
+        return (
+            f"Погода в {location}:\n\n"
+            f"• Температура: {temp}°C (ощущается как {feels}°C)\n"
+            f"• Состояние: {cond}\n"
+            f"• Влажность: {hum}%\n"
+            f"• Ветер: {wind}\n\n"
+            f"Обновлено: {time}"
+        )
+    except Exception as e:
+        log(f"Ошибка форматирования: {e}")
+        return f"Ошибка обработки данных: {e}"
+</code></pre>
+
+    <h2 id="hook">Перехват отправки сообщения</h2>
+    <p>Регистрируем хук в методе <code>on_plugin_load</code> и реализуем логику в <code>on_send_message_hook</code>:</p>
+    <pre><code>from base_plugin import BasePlugin, HookResult, HookStrategy
+from typing import Any
+
+class WeatherPlugin(BasePlugin):
+    def on_plugin_load(self):
+        self.add_on_send_message_hook()
+
+    def on_send_message_hook(self, account: int, params: Any) -> HookResult:
+        msg = params.message
+        if not isinstance(msg, str) or not msg.startswith(".wt"):
+            return HookResult()
+
+        parts = msg.strip().split(" ", 1)
+        city = parts[1] if len(parts) > 1 else "Moscow"
+        if not city:
+            params.message = "Использование: .wt [город]"
+            return HookResult(strategy=HookStrategy.MODIFY, params=params)
+
+        data = fetch_weather_data(city)
+        if not data:
+            params.message = f"Не удалось получить данные для «{city}»"
+        else:
+            params.message = format_weather_data(data, city)
+
+        return HookResult(strategy=HookStrategy.MODIFY, params=params)
+</code></pre>
+
+    <p>Готово! Теперь при отправке сообщения <code>.wt Москва</code> плагин подставит данные о погоде.</p>
+  </main>
+</body>
+</html>

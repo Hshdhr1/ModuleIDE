@@ -1,0 +1,123 @@
+<!-- alert-dialog-builder.html -->
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Alert Dialog Builder · Документация</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <nav class="toc">
+    <h2>Содержание</h2>
+    <ul>
+      <li><a href="#intro">Введение</a></li>
+      <li><a href="#usage">Базовое использование</a></li>
+      <li><a href="#types">Типы диалогов</a></li>
+      <li><a href="#methods">Ключевые методы</a></li>
+      <li><a href="#example-list">Пример с выбором</a></li>
+      <li><a href="#notes">Важные замечания</a></li>
+    </ul>
+  </nav>
+
+  <main>
+    <h1 id="intro">Введение</h1>
+    <p>
+      Класс <code>AlertDialogBuilder</code> (в файле <code>alert.py</code>) — это удобный Python‑обертка для создания и управления диалогами в стиле Telegram. Обертка над <code>org.telegram.ui.ActionBar.AlertDialog.Builder</code>, упрощающая работу в плагинах. :contentReference[oaicite:1]{index=1}
+    </p>
+
+    <h1 id="usage">Базовое использование</h1>
+    <pre><code>from ui.alert import AlertDialogBuilder
+from client_utils import get_last_fragment
+from android_utils import log
+
+# Получаем текущий фрагмент и activity
+fragment = get_last_fragment()
+if not fragment:
+    log("Нет текущего фрагмента — диалог не показан.")
+    # return
+
+activity = fragment.getParentActivity()
+if not activity:
+    log("Нет activity — диалог не показан.")
+    # return
+
+# Создаём простой информационный диалог
+builder = AlertDialogBuilder(activity)  # ALERT_TYPE_MESSAGE по умолчанию
+builder.set_title("Важное сообщение")
+builder.set_message("Это сообщение от плагина.")
+
+# Обработчики кнопок
+def on_ok(bld, which):
+    log("Нажата кнопка OK")
+    bld.dismiss()
+
+def on_cancel(bld, which):
+    log("Нажата кнопка Отмена")
+    bld.dismiss()
+
+builder.set_positive_button("OK", on_ok)
+builder.set_negative_button("Отмена", on_cancel)
+builder.show()
+</code></pre>
+
+    <h1 id="types">Типы диалогов</h1>
+    <p>В конструкторе можно указать тип диалога через параметр <code>progress_style</code>:</p>
+    <ul>
+      <li><code>ALERT_TYPE_MESSAGE</code> – стандартный текстовый.</li>
+      <li><code>ALERT_TYPE_LOADING</code> – с горизонтальным индикатором и настройкой через <code>set_progress(value)</code>.</li>
+      <li><code>ALERT_TYPE_SPINNER</code> – загрузочный спиннер. Пример создания и использования :contentReference[oaicite:2]{index=2}:</li>
+    </ul>
+    <pre><code>loading = AlertDialogBuilder(activity, AlertDialogBuilder.ALERT_TYPE_SPINNER)
+loading.set_title("Загрузка")
+loading.set_message("Подождите...")
+loading.set_cancelable(False)
+loading.show()
+
+# После завершения:
+loading.dismiss()
+</code></pre>
+
+    <h1 id="methods">Ключевые методы</h1>
+    <ul>
+      <li><code>set_title(title: str)</code>: устанавливает заголовок.</li>
+      <li><code>set_message(msg: str)</code>: основной текст.</li>
+      <li><code>set_positive_button(text, listener)</code>, <code>set_negative_button</code>, <code>set_neutral_button</code>: кнопки — слушатель получает два параметра (<code>self</code>, идентификатор).</li>
+      <li><code>make_button_red(button_type)</code>: окрас кнопки (например, негативной) в красный.</li>
+      <li><code>set_items(list, listener, icons=None)</code>: список элементов с иконками и слушателем клика.</li>
+      <li><code>set_on_back_button_listener(listener)</code>, <code>set_on_dismiss_listener(listener)</code>, <code>set_on_cancel_listener(listener)</code>: обратные вызовы.</li>
+      <li>Дополнительно: <code>set_top_image</code>, <code>set_top_drawable</code>, <code>set_top_animation</code>, <code>set_dim_enabled</code>, <code>set_blurred_background</code>, <code>set_cancelable</code>, <code>set_canceled_on_touch_outside</code> :contentReference[oaicite:3]{index=3}.</li>
+      <li>Жизненный цикл: <code>create()</code>, <code>show()</code>, <code>dismiss()</code>, <code>get_dialog()</code>, <code>get_button()</code> :contentReference[oaicite:4]{index=4}.</li>
+      <li>Для <code>ALERT_TYPE_LOADING</code>: <code>set_progress(int)</code> :contentReference[oaicite:5]{index=5}.</li>
+    </ul>
+
+    <h1 id="example-list">Пример: диалог со списком опций</h1>
+    <pre><code>from ui.alert import AlertDialogBuilder
+from client_utils import get_last_fragment
+from android_utils import log
+
+# Создаём список
+def on_item(bld, idx):
+    options = ["Пункт A", "Пункт B", "Пункт C"]
+    log(f"Выбран {options[idx]} с индексом {idx}")
+    bld.dismiss()
+
+fragment = get_last_fragment()
+activity = fragment.getParentActivity()
+item_builder = AlertDialogBuilder(activity)
+item_builder.set_title("Выберите пункт")
+item_builder.set_items(["A", "B", "C"], on_item)
+item_builder.set_negative_button("Отмена", lambda b, w: b.dismiss())
+item_builder.show()
+</code></pre>
+
+    <h1 id="notes">Важные замечания</h1>
+    <ul>
+      <li>Перед созданием обязательно передать рабочий Android `Context`, как правило, `get_last_fragment().getParentActivity()` :contentReference[oaicite:6]{index=6}.</li>
+      <li>Слушатели получают объект <code>AlertDialogBuilder</code>, что позволяет вызывать методы диалога прямо внутри.</li>
+      <li>Для безопасности UI‑потока вызывайте создание/показ/закрытие диалога внутри `android_utils.run_on_ui_thread`, если делаете это в фоне :contentReference[oaicite:7]{index=7}.</li>
+      <li>Внутри обёрток слушателей присутствуют блоки try-except — ошибки логируются, диалог не падает :contentReference[oaicite:8]{index=8}.</li>
+    </ul>
+  </main>
+</body>
+</html>

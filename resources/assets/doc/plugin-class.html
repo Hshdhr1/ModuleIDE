@@ -1,0 +1,79 @@
+<!-- plugin-class.html -->
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Plugin Class · Документация</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <nav class="toc">
+    <h2>Содержание</h2>
+    <ul>
+      <li><a href="#overview">Обзор</a></li>
+      <li><a href="#metadata">Метаданные</a></li>
+      <li><a href="#lifecycle">Жизненный цикл</a></li>
+      <li><a href="#hooks">Hooks</a></li>
+      <li><a href="#interfaces">Взаимодействие с Telegram</a></li>
+    </ul>
+  </nav>
+
+  <main>
+    <h1 id="overview">Обзор Plugin Class</h1>
+    <p>Все плагины должны реализовывать класс, унаследованный от <code>BasePlugin</code>. Этот класс управляет логикой, которая выполняется во время загрузки, перехвата сообщений и взаимодействия с Telegram API.</p>
+
+    <h1 id="metadata">Метаданные плагина</h1>
+    <p>В начале каждого <code>.plugin</code> файла можно (и рекомендуется) указать метаданные:</p>
+    <pre><code>__min_version__ = ">=1.0.0"
+__icon__ = "sPluginIDE/0"
+</code></pre>
+
+    <ul>
+      <li><code>__min_version__</code> — минимально необходимая версия среды exteraGram.</li>
+      <li><code>__icon__</code> — ссылка и индекс стикера, иконка плагина в интерфейсе.</li>
+    </ul>
+
+    <p><strong>Важно:</strong> метаданные <code>__name__</code>, <code>__description__</code>, <code>__author__</code>, <code>__version__</code>, <code>__id</code> задаются и редактируются в редакторе версии плагина. Удалить версию можно в менеджере версий.</p>
+
+    <h1 id="lifecycle">Методы жизненного цикла</h1>
+    <p>Эти методы можно переопределить в вашем классе плагина:</p>
+    <ul>
+      <li><code>on_plugin_load(self)</code> — вызывается при загрузке плагина.</li>
+      <li><code>on_plugin_unload(self)</code> — вызывается при выгрузке плагина.</li>
+    </ul>
+
+    <h1 id="hooks">Hooks: перехваты событий</h1>
+    <p>Плагины могут перехватывать события, например, отправку сообщений. Для этого используется <code>add_on_send_message_hook</code>:</p>
+    <pre><code>def on_plugin_load(self):
+    self.add_on_send_message_hook()
+</code></pre>
+
+    <p>Хук должен реализовывать метод:</p>
+    <pre><code>def on_send_message_hook(self, account: int, params: Any) -> HookResult:
+    ...
+</code></pre>
+
+    <p>Хуки позволяют модифицировать сообщение, блокировать отправку или продолжить без изменений. Используется объект <code>HookResult</code> с параметром <code>strategy</code>:</p>
+    <ul>
+      <li><code>HookStrategy.MODIFY</code> — изменить сообщение.</li>
+      <li><code>HookStrategy.BLOCK</code> — отменить отправку.</li>
+      <li><code>HookStrategy.CONTINUE</code> — ничего не делать.</li>
+    </ul>
+
+    <h1 id="interfaces">Работа с Telegram-интерфейсами</h1>
+    <p>Вы можете использовать доступ к Telegram API через встроенные инструменты. Например:</p>
+    <pre><code>self.send_message(account, peer, "Привет от плагина!")</code></pre>
+
+    <p>Доступные методы:</p>
+    <ul>
+      <li><code>send_message</code> — отправка сообщения.</li>
+      <li><code>delete_messages</code> — удаление сообщений.</li>
+      <li><code>get_dialogs</code> — список чатов.</li>
+      <li><code>get_me</code> — информация о текущем аккаунте.</li>
+    </ul>
+
+    <p>Подробности доступны в соответствующих разделах API в будущем.</p>
+  </main>
+</body>
+</html>
