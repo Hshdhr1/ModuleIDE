@@ -1,0 +1,44 @@
+```
+# Compiled and build artifacts
+*.class
+*.o
+*.obj
+*.out
+*.pyc
+__pycache__/
+*.pyo
+*.pyd
+*.so
+*.dll
+*.exe
+*.jar
+*.war
+*.aar
+*.apk
+build/
+dist/
+target/
+out/
+# Dependencies
+node_modules/
+venv/
+.venv/
+.env
+.env.local
+*.env.*
+.gradle/
+.mypy_cache/
+.pytest_cache/
+coverage/
+htmlcov/
+# Editors
+.vscode/
+.idea/
+*.swp
+*.swo
+*.tmp
+# System
+.DS_Store
+Thumbs.db
+*.log
+```

@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Heroku</string>
+    
+    <!-- Main Menu -->
+    <string name="menu_heroku">Heroku</string>
+    <string name="menu_settings">Настройки</string>
+    <string name="menu_chat">Чат</string>
+    
+    <!-- Settings Screen -->
+    <string name="settings_title">Настройки Heroku</string>
+    <string name="settings_system_prompt">Системный промпт</string>
+    <string name="settings_system_prompt_hint">Введите системный промпт...</string>
+    <string name="settings_preset_prompts">Пресеты промптов</string>
+    <string name="preset_helpful_assistant">Полезный ассистент</string>
+    <string name="preset_expert_programmer">Эксперт-программист</string>
+    <string name="preset_creative_writer">Креативный писатель</string>
+    <string name="preset_psychologist">Психолог</string>
+    <string name="preset_teacher">Учитель</string>
+    <string name="preset_sarcastic">Саркастичный помощник</string>
+    
+    <!-- Gemini Settings -->
+    <string name="gemini_settings">Google Gemini</string>
+    <string name="gemini_api_key">API ключ Gemini</string>
+    <string name="gemini_api_key_hint">Введите ваш API ключ Google Gemini</string>
+    <string name="gemini_load_models">Загрузить список моделей</string>
+    <string name="gemini_select_model">Выбрать модель</string>
+    <string name="gemini_no_models">Модели не загружены</string>
+    
+    <!-- Custom Provider Settings -->
+    <string name="custom_providers">Пользовательские провайдеры</string>
+    <string name="add_provider">Добавить провайдер</string>
+    <string name="provider_name">Название провайдера</string>
+    <string name="provider_name_hint">Например: OpenAI, LocalAI</string>
+    <string name="provider_endpoint">API Endpoint (Base URL)</string>
+    <string name="provider_endpoint_hint">https://api.example.com/v1</string>
+    <string name="provider_api_key">API Key</string>
+    <string name="provider_api_key_hint">Введите ваш API ключ</string>
+    <string name="provider_model">Модель</string>
+    <string name="provider_model_hint">Например: gpt-3.5-turbo</string>
+    <string name="provider_load_models">Загрузить модели</string>
+    <string name="provider_test_connection">Тест соединения</string>
+    <string name="provider_edit">Редактировать</string>
+    <string name="provider_delete">Удалить</string>
+    <string name="provider_save">Сохранить</string>
+    <string name="provider_cancel">Отмена</string>
+    <string name="provider_active">Активный провайдер</string>
+    <string name="provider_select">Выбрать</string>
+    
+    <!-- Chat Settings -->
+    <string name="chat_settings">Настройки чата</string>
+    <string name="temperature">Температура</string>
+    <string name="temperature_value">Температура: %.2f</string>
+    <string name="clear_history">Очистить историю</string>
+    <string name="export_history">Экспорт истории</string>
+    
+    <!-- Chat Interface -->
+    <string name="chat_input_hint">Введите сообщение...</string>
+    <string name="chat_send">Отправить</string>
+    <string name="chat_stop">Стоп</string>
+    <string name="chat_clear">Очистить</string>
+    <string name="chat_welcome">Добро пожаловать в Heroku!\nВыберите провайдер в настройках и начните общение с ИИ.</string>
+    
+    <!-- Context Menu -->
+    <string name="context_ask_heroku">Спросить у Heroku</string>
+    
+    <!-- Messages & Errors -->
+    <string name="error_network">Ошибка сети. Проверьте подключение к интернету.</string>
+    <string name="error_invalid_api_key">Неверный API ключ. Пожалуйста, проверьте его в настройках.</string>
+    <string name="error_rate_limit">Превышен лимит запросов. Попробуйте позже.</string>
+    <string name="error_invalid_endpoint">Неверный адрес endpoint. Проверьте URL.</string>
+    <string name="error_timeout">Время ожидания истекло. Повторите попытку.</string>
+    <string name="error_unknown">Произошла неизвестная ошибка.</string>
+    <string name="error_empty_message">Введите сообщение</string>
+    <string name="error_no_provider">Выберите активного провайдера в настройках</string>
+    <string name="success_connection">Соединение успешно!</string>
+    <string name="success_saved">Сохранено</string>
+    <string name="success_deleted">Удалено</string>
+    <string name="loading">Загрузка...</string>
+    <string name="sending">Отправка...</string>
+    <string name="models_loaded">Загружено моделей: %d</string>
+    
+    <!-- Dialogs -->
+    <string name="dialog_confirm_delete">Вы уверены, что хотите удалить этого провайдера?</string>
+    <string name="dialog_confirm_clear">Вы уверены, что хотите очистить всю историю чата?</string>
+    <string name="dialog_yes">Да</string>
+    <string name="dialog_no">Нет</string>
+    <string name="dialog_ok">OK</string>
+    
+    <!-- Provider Types -->
+    <string name="provider_type_gemini">Google Gemini</string>
+    <string name="provider_type_openai">OpenAI-совместимый</string>
+</resources>
