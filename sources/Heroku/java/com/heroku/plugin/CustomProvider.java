@@ -1,37 +1,33 @@
 package com.heroku.plugin;
 
-import java.util.UUID;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 /**
- * Модель пользовательского провайдера API.
- * Представляет собой OpenAI-совместимый endpoint.
+ * Модель пользовательского провайдера (OpenAI-совместимого).
+ * Содержит все необходимые параметры для подключения к API.
  */
 public class CustomProvider {
-    private final String id;
+    private String id;
     private String name;
     private String endpoint;
     private String apiKey;
     private String model;
+    private boolean supportsStreaming;
+    private String description;
     
-    public CustomProvider(String name, String endpoint, String apiKey, String model) {
-        this.id = UUID.randomUUID().toString();
-        this.name = name;
-        this.endpoint = endpoint;
-        this.apiKey = apiKey;
-        this.model = model;
+    public CustomProvider() {
+        this.supportsStreaming = true;
     }
     
-    // Конструктор для восстановления из JSON
-    public CustomProvider(String id, String name, String endpoint, String apiKey, String model) {
-        this.id = id;
-        this.name = name;
-        this.endpoint = endpoint;
-        this.apiKey = apiKey;
-        this.model = model;
-    }
+    // Геттеры и сеттеры
     
     public String getId() {
         return id;
+    }
+    
+    public void setId(String id) {
+        this.id = id;
     }
     
     public String getName() {
@@ -66,42 +62,63 @@ public class CustomProvider {
         this.model = model;
     }
     
-    /**
-     * Получение полного URL для чата
-     */
-    public String getChatUrl() {
-        String base = endpoint.endsWith("/") ? endpoint : endpoint + "/";
-        return base + "chat/completions";
+    public boolean isSupportsStreaming() {
+        return supportsStreaming;
+    }
+    
+    public void setSupportsStreaming(boolean supportsStreaming) {
+        this.supportsStreaming = supportsStreaming;
+    }
+    
+    public String getDescription() {
+        return description;
+    }
+    
+    public void setDescription(String description) {
+        this.description = description;
     }
     
     /**
-     * Получение URL для списка моделей
+     * Преобразует провайдер в JSONObject для сохранения.
      */
-    public String getModelsUrl() {
-        String base = endpoint.endsWith("/") ? endpoint : endpoint + "/";
-        return base + "models";
+    public JSONObject toJson() throws JSONException {
+        JSONObject json = new JSONObject();
+        json.put("id", id);
+        json.put("name", name);
+        json.put("endpoint", endpoint);
+        json.put("apiKey", apiKey);
+        json.put("model", model);
+        json.put("supportsStreaming", supportsStreaming);
+        json.put("description", description != null ? description : "");
+        return json;
     }
     
-    @Override
-    public boolean equals(Object obj) {
-        if (this == obj) return true;
-        if (obj == null || getClass() != obj.getClass()) return false;
-        CustomProvider that = (CustomProvider) obj;
-        return id.equals(that.id);
+    /**
+     * Создаёт провайдер из JSONObject.
+     */
+    public static CustomProvider fromJson(JSONObject json) throws JSONException {
+        CustomProvider provider = new CustomProvider();
+        provider.setId(json.optString("id", ""));
+        provider.setName(json.optString("name", ""));
+        provider.setEndpoint(json.optString("endpoint", ""));
+        provider.setApiKey(json.optString("apiKey", ""));
+        provider.setModel(json.optString("model", ""));
+        provider.setSupportsStreaming(json.optBoolean("supportsStreaming", true));
+        provider.setDescription(json.optString("description", ""));
+        return provider;
     }
     
-    @Override
-    public int hashCode() {
-        return id.hashCode();
+    /**
+     * Проверяет, заполнены ли все обязательные поля.
+     */
+    public boolean isValid() {
+        return name != null && !name.isEmpty() &&
+               endpoint != null && !endpoint.isEmpty() &&
+               apiKey != null && !apiKey.isEmpty();
     }
     
     @Override
     public String toString() {
-        return "CustomProvider{" +
-                "id='" + id + '\'' +
-                ", name='" + name + '\'' +
-                ", endpoint='" + endpoint + '\'' +
-                ", model='" + model + '\'' +
-                '}';
+        return name + " (" + endpoint + ")";
     }
 }

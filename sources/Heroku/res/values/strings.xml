@@ -90,4 +90,24 @@
     <!-- Provider Types -->
     <string name="provider_type_gemini">Google Gemini</string>
     <string name="provider_type_openai">OpenAI-совместимый</string>
+    <string name="provider_type_openrouter">OpenRouter</string>
+
+    <!-- OpenRouter Preset -->
+    <string name="preset_openrouter_name">OpenRouter</string>
+    <string name="preset_openrouter_endpoint">https://openrouter.ai/api/v1</string>
+    <string name="preset_openrouter_info">OpenRouter предоставляет доступ к множеству моделей через единый API</string>
+
+    <!-- Additional UI Strings -->
+    <string name="plugin_description">Красивый AI чат с поддержкой Gemini и OpenAI-совместимых провайдеров</string>
+    <string name="menu_entry">Heroku AI Чат</string>
+    <string name="providers_title">Управление провайдерами</string>
+    <string name="provider_edit_title">Редактирование провайдера</string>
+    <string name="no_providers">Нет добавленных провайдеров</string>
+    <string name="add_openrouter">Добавить OpenRouter</string>
+    <string name="streaming_enabled">Потоковый режим включён</string>
+    <string name="streaming_disabled">Потоковый режим отключён</string>
+    <string name="syntax_highlight">Подсветка синтаксиса</string>
+    <string name="copy_code">Копировать код</string>
+    <string name="code_copied">Код скопирован в буфер обмена</string>
+    <string name="animation_loading">Анимация загрузки</string>
 </resources>

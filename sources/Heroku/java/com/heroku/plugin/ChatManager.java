@@ -3,10 +3,10 @@ package com.heroku.plugin;
 import android.content.Context;
 import android.util.Log;
 import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 import java.io.File;
 import java.io.FileWriter;
-import java.io.FileReader;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -16,208 +16,259 @@ import java.util.Locale;
 
 /**
  * Менеджер истории чата.
- * Сохраняет и загружает историю переписки локально.
+ * Сохраняет и загружает историю сообщений, поддерживает экспорт.
  */
 public class ChatManager {
-    private static final String TAG = "HerokuChatManager";
+    private static final String TAG = "HerokuChat";
     private static final String CHAT_HISTORY_FILE = "heroku_chat_history.json";
-    private static final int MAX_HISTORY_SIZE = 100;
     
     private final Context context;
-    private final List<ChatMessage> messageHistory;
+    private final List<ChatMessage> messages;
     
-    public ChatManager(Context context) {
-        this.context = context.getApplicationContext();
-        this.messageHistory = new ArrayList<>();
-        loadHistory();
+    /**
+     * Типы сообщений в чате.
+     */
+    public enum MessageType {
+        USER,
+        AI,
+        SYSTEM
     }
     
     /**
-     * Модель сообщения чата
+     * Модель сообщения чата.
      */
     public static class ChatMessage {
-        public enum Role {
-            USER,
-            ASSISTANT,
-            SYSTEM
-        }
+        public MessageType type;
+        public String content;
+        public long timestamp;
+        public String providerId;
         
-        private final String id;
-        private final Role role;
-        private final String content;
-        private final long timestamp;
-        
-        public ChatMessage(Role role, String content) {
-            this.id = java.util.UUID.randomUUID().toString();
-            this.role = role;
+        public ChatMessage(MessageType type, String content) {
+            this.type = type;
             this.content = content;
             this.timestamp = System.currentTimeMillis();
         }
         
-        // Для восстановления из JSON
-        public ChatMessage(String id, String roleStr, String content, long timestamp) {
-            this.id = id;
-            this.role = Role.valueOf(roleStr);
-            this.content = content;
-            this.timestamp = timestamp;
+        public ChatMessage(MessageType type, String content, String providerId) {
+            this(type, content);
+            this.providerId = providerId;
         }
         
-        public String getId() { return id; }
-        public Role getRole() { return role; }
-        public String getContent() { return content; }
-        public long getTimestamp() { return timestamp; }
+        public JSONObject toJson() throws JSONException {
+            JSONObject json = new JSONObject();
+            json.put("type", type.name());
+            json.put("content", content);
+            json.put("timestamp", timestamp);
+            if (providerId != null) {
+                json.put("providerId", providerId);
+            }
+            return json;
+        }
+        
+        public static ChatMessage fromJson(JSONObject json) throws JSONException {
+            ChatMessage msg = new ChatMessage(
+                MessageType.valueOf(json.optString("type", "USER")),
+                json.optString("content", "")
+            );
+            msg.timestamp = json.optLong("timestamp", System.currentTimeMillis());
+            msg.providerId = json.optString("providerId", null);
+            return msg;
+        }
         
         public String getFormattedTime() {
             SimpleDateFormat sdf = new SimpleDateFormat("HH:mm", Locale.getDefault());
             return sdf.format(new Date(timestamp));
         }
-        
-        public JSONObject toJson() throws org.json.JSONException {
-            JSONObject obj = new JSONObject();
-            obj.put("id", id);
-            obj.put("role", role.name());
-            obj.put("content", content);
-            obj.put("timestamp", timestamp);
-            return obj;
-        }
-        
-        public static ChatMessage fromJson(JSONObject obj) throws org.json.JSONException {
-            return new ChatMessage(
-                obj.getString("id"),
-                obj.getString("role"),
-                obj.getString("content"),
-                obj.getLong("timestamp")
-            );
-        }
+    }
+    
+    public ChatManager(Context context) {
+        this.context = context.getApplicationContext();
+        this.messages = new ArrayList<>();
+        loadHistory();
     }
     
     /**
-     * Загрузка истории из файла
+     * Добавляет сообщение в историю.
      */
-    public void loadHistory() {
-        File file = new File(context.getFilesDir(), CHAT_HISTORY_FILE);
-        if (!file.exists()) {
-            Log.d(TAG, "Файл истории не найден, создаём новую историю");
-            return;
-        }
-        
-        try (FileReader reader = new FileReader(file)) {
-            StringBuilder sb = new StringBuilder();
-            char[] buffer = new char[1024];
-            int read;
-            while ((read = reader.read(buffer)) != -1) {
-                sb.append(buffer, 0, read);
-            }
-            
-            String json = sb.toString();
-            JSONArray array = new JSONArray(json);
-            
-            messageHistory.clear();
-            for (int i = 0; i < array.length(); i++) {
-                JSONObject obj = array.getJSONObject(i);
-                ChatMessage msg = ChatMessage.fromJson(obj);
-                messageHistory.add(msg);
-            }
-            
-            Log.d(TAG, "История загружена: " + messageHistory.size() + " сообщений");
-            
-        } catch (Exception e) {
-            Log.e(TAG, "Ошибка загрузки истории", e);
-            messageHistory.clear();
-        }
+    public void addMessage(ChatMessage message) {
+        messages.add(message);
+        saveHistory();
     }
     
     /**
-     * Сохранение истории в файл
+     * Добавляет пользовательское сообщение.
      */
-    public void saveHistory() {
+    public void addUserMessage(String content) {
+        addMessage(new ChatMessage(MessageType.USER, content));
+    }
+    
+    /**
+     * Добавляет AI сообщение.
+     */
+    public void addAiMessage(String content, String providerId) {
+        addMessage(new ChatMessage(MessageType.AI, content, providerId));
+    }
+    
+    /**
+     * Добавляет системное сообщение.
+     */
+    public void addSystemMessage(String content) {
+        addMessage(new ChatMessage(MessageType.SYSTEM, content));
+    }
+    
+    /**
+     * Получает все сообщения.
+     */
+    public List<ChatMessage> getMessages() {
+        return new ArrayList<>(messages);
+    }
+    
+    /**
+     * Очищает всю историю.
+     */
+    public void clearHistory() {
+        messages.clear();
+        saveHistory();
+    }
+    
+    /**
+     * Получает последние N сообщений для контекста.
+     */
+    public List<ChatMessage> getRecentMessages(int count) {
+        int size = messages.size();
+        if (size <= count) {
+            return new ArrayList<>(messages);
+        }
+        return messages.subList(size - count, size);
+    }
+    
+    /**
+     * Сохраняет историю в файл.
+     */
+    private void saveHistory() {
         try {
             JSONArray array = new JSONArray();
-            for (ChatMessage msg : messageHistory) {
+            for (ChatMessage msg : messages) {
                 array.put(msg.toJson());
             }
             
             File file = new File(context.getFilesDir(), CHAT_HISTORY_FILE);
-            try (FileWriter writer = new FileWriter(file)) {
-                writer.write(array.toString());
-            }
+            FileWriter writer = new FileWriter(file);
+            writer.write(array.toString());
+            writer.close();
             
-            Log.d(TAG, "История сохранена: " + messageHistory.size() + " сообщений");
-            
+            Log.d(TAG, "История сохранена: " + messages.size() + " сообщений");
         } catch (Exception e) {
             Log.e(TAG, "Ошибка сохранения истории", e);
         }
     }
     
     /**
-     * Добавление сообщения в историю
+     * Загружает историю из файла.
      */
-    public void addMessage(ChatMessage.Role role, String content) {
-        ChatMessage msg = new ChatMessage(role, content);
-        messageHistory.add(msg);
-        
-        // Ограничиваем размер истории
-        while (messageHistory.size() > MAX_HISTORY_SIZE) {
-            messageHistory.remove(0);
-        }
-        
-        saveHistory();
-    }
-    
-    /**
-     * Получение всей истории
-     */
-    public List<ChatMessage> getHistory() {
-        return new ArrayList<>(messageHistory);
-    }
-    
-    /**
-     * Очистка истории
-     */
-    public void clearHistory() {
-        messageHistory.clear();
-        saveHistory();
-        Log.d(TAG, "История очищена");
-    }
-    
-    /**
-     * Экспорт истории в текстовый файл
-     */
-    public File exportHistory() {
+    private void loadHistory() {
         try {
-            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd_HH-mm-ss", Locale.getDefault());
-            String filename = "heroku_export_" + sdf.format(new Date()) + ".txt";
-            File file = new File(context.getFilesDir(), filename);
-            
-            try (FileWriter writer = new FileWriter(file)) {
-                writer.write("=== История чата Heroku ===\n");
-                writer.write("Дата экспорта: " + sdf.format(new Date()) + "\n\n");
-                
-                for (ChatMessage msg : messageHistory) {
-                    String roleStr = msg.getRole() == ChatMessage.Role.USER ? "Вы" : "AI";
-                    writer.write(String.format("[%s] %s:\n%s\n\n", 
-                        msg.getFormattedTime(), roleStr, msg.getContent()));
-                }
+            File file = new File(context.getFilesDir(), CHAT_HISTORY_FILE);
+            if (!file.exists()) {
+                Log.d(TAG, "Файл истории не найден");
+                return;
             }
             
-            Log.d(TAG, "История экспортирована: " + file.getAbsolutePath());
-            return file;
+            StringBuilder sb = new StringBuilder();
+            java.io.BufferedReader reader = new java.io.BufferedReader(
+                new java.io.FileReader(file));
+            String line;
+            while ((line = reader.readLine()) != null) {
+                sb.append(line);
+            }
+            reader.close();
             
+            JSONArray array = new JSONArray(sb.toString());
+            messages.clear();
+            
+            for (int i = 0; i < array.length(); i++) {
+                JSONObject obj = array.getJSONObject(i);
+                messages.add(ChatMessage.fromJson(obj));
+            }
+            
+            Log.d(TAG, "История загружена: " + messages.size() + " сообщений");
+        } catch (Exception e) {
+            Log.e(TAG, "Ошибка загрузки истории", e);
+            messages.clear();
+        }
+    }
+    
+    /**
+     * Экспортирует историю в текстовый файл.
+     */
+    public String exportHistory() {
+        StringBuilder sb = new StringBuilder();
+        sb.append("=== История чата Heroku ===\n");
+        sb.append("Дата экспорта: ").append(
+            new SimpleDateFormat("dd.MM.yyyy HH:mm", Locale.getDefault())
+                .format(new Date())).append("\n\n");
+        
+        for (ChatMessage msg : messages) {
+            String prefix;
+            switch (msg.type) {
+                case USER:
+                    prefix = "👤 Вы";
+                    break;
+                case AI:
+                    prefix = "🤖 Heroku";
+                    break;
+                case SYSTEM:
+                    prefix = "⚙️ Система";
+                    break;
+                default:
+                    prefix = "?";
+            }
+            
+            sb.append("[").append(msg.getFormattedTime()).append("] ")
+              .append(prefix).append(":\n")
+              .append(msg.content).append("\n\n");
+        }
+        
+        return sb.toString();
+    }
+    
+    /**
+     * Сохраняет экспорт в файл.
+     */
+    public File saveExportToFile() {
+        try {
+            String timestamp = new SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault())
+                .format(new Date());
+            String filename = "heroku_export_" + timestamp + ".txt";
+            
+            File file = new File(context.getFilesDir(), filename);
+            FileWriter writer = new FileWriter(file);
+            writer.write(exportHistory());
+            writer.close();
+            
+            Log.d(TAG, "Экспорт сохранён: " + file.getAbsolutePath());
+            return file;
         } catch (IOException e) {
-            Log.e(TAG, "Ошибка экспорта истории", e);
+            Log.e(TAG, "Ошибка сохранения экспорта", e);
             return null;
         }
     }
     
     /**
-     * Получение последних N сообщений для контекста
+     * Форматирует историю для отправки в AI как контекст.
      */
-    public List<ChatMessage> getRecentMessages(int count) {
-        List<ChatMessage> recent = new ArrayList<>();
-        int start = Math.max(0, messageHistory.size() - count);
-        for (int i = start; i < messageHistory.size(); i++) {
-            recent.add(messageHistory.get(i));
+    public String formatContextForAI(int maxMessages) {
+        List<ChatMessage> recent = getRecentMessages(maxMessages);
+        StringBuilder sb = new StringBuilder();
+        
+        for (ChatMessage msg : recent) {
+            if (msg.type == MessageType.USER) {
+                sb.append("User: ").append(msg.content).append("\n");
+            } else if (msg.type == MessageType.AI) {
+                sb.append("Assistant: ").append(msg.content).append("\n");
+            }
         }
-        return recent;
+        
+        return sb.toString();
     }
 }
