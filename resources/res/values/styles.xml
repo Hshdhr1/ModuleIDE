@@ -24,6 +24,14 @@
     <style name="AppTheme" parent="@style/Theme.Material3.DayNight.NoActionBar">
         <item name="android:statusBarColor">@android:color/transparent</item>
         <item name="android:navigationBarColor">@android:color/transparent</item>
+        <item name="android:windowBackground">@color/soft_bg</item>
+        <item name="colorPrimary">@color/soft_primary</item>
+        <item name="colorPrimaryContainer">@color/soft_secondary</item>
+        <item name="colorSecondary">@color/soft_secondary</item>
+        <item name="colorSurface">@color/soft_surface</item>
+        <item name="colorBackground">@color/soft_bg</item>
+        <item name="colorOnPrimary">@color/soft_on_primary</item>
+        <item name="colorOnSurface">@color/soft_on_surface</item>
     </style>
     <style name="AppTheme.AppBarOverlay" parent="@style/ThemeOverlay.Material3">
     </style>

@@ -257,4 +257,19 @@
     <color name="test_color">#000</color>
     <color name="tooltip_background_dark">#e6616161</color>
     <color name="tooltip_background_light">#e6ffffff</color>
+
+    <!-- Soft lavender palette -->
+    <color name="soft_bg">#D9D8EE</color>
+    <color name="soft_surface">#F4F2FA</color>
+    <color name="soft_primary">#6F57B2</color>
+    <color name="soft_secondary">#CFCBEA</color>
+    <color name="soft_on_primary">#FFFFFF</color>
+    <color name="soft_on_surface">#3F3D4A</color>
+
+    <!-- Material You chat palette (light) -->
+    <color name="chat_primary">#6750A4</color>
+    <color name="chat_on_primary">#FFFFFF</color>
+    <color name="chat_primary_container">#EADDFF</color>
+    <color name="chat_on_primary_container">#21005D</color>
+
 </resources>
