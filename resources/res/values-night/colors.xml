@@ -2,4 +2,18 @@
 <resources>
     <color name="gr1">#4d1010</color>
     <color name="gr2">#33084d</color>
+
+    <color name="soft_bg">#2E2A3F</color>
+    <color name="soft_surface">#3A3550</color>
+    <color name="soft_primary">#A895E8</color>
+    <color name="soft_secondary">#5A5378</color>
+    <color name="soft_on_primary">#1C1730</color>
+    <color name="soft_on_surface">#F1EEFF</color>
+
+    <!-- Material You chat palette (dark) -->
+    <color name="chat_primary">#D0BCFF</color>
+    <color name="chat_on_primary">#381E72</color>
+    <color name="chat_primary_container">#4F378B</color>
+    <color name="chat_on_primary_container">#EADDFF</color>
+
 </resources>
