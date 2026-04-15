@@ -88,6 +88,14 @@
                         android:src="@drawable/icon_create_round"
                         android:scaleType="fitCenter"/>
                     <ImageView
+                        android:id="@+id/HeaderButtonVersions"
+                        android:padding="4dp"
+                        android:layout_width="28dp"
+                        android:layout_height="28dp"
+                        android:layout_marginLeft="8dp"
+                        android:src="@drawable/icon_extension_round"
+                        android:scaleType="fitCenter"/>
+                    <ImageView
                         android:id="@+id/AiChatB"
                         android:padding="4dp"
                         android:layout_width="28dp"
@@ -128,32 +136,46 @@
                 <LinearLayout
                     android:orientation="horizontal"
                     android:id="@+id/linear8"
+                    android:background="#15171C"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:layout_weight="1">
                     <ScrollView
                         android:id="@+id/vscroll1"
+                        android:background="#15171C"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
                         android:layout_marginLeft="8dp">
                         <LinearLayout
-                            android:orientation="vertical"
+                            android:orientation="horizontal"
                             android:id="@+id/linear9"
                             android:paddingBottom="55dp"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content">
+                            <TextView
+                                android:textSize="12sp"
+                                android:textColor="#6E778D"
+                                android:gravity="top|end"
+                                android:id="@+id/lineNumbers"
+                                android:paddingTop="2dp"
+                                android:paddingLeft="4dp"
+                                android:paddingRight="8dp"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="1"/>
                             <com.blacksquircle.ui.editorkit.widget.TextProcessor
                                 android:textSize="14sp"
-                                android:textColor="?attr/colorOnSurface"
-                                android:textColorHint="?attr/colorOnSurfaceVariant"
+                                android:textColor="#E9EDF6"
+                                android:textColorHint="#7D8596"
                                 android:gravity="top|left"
                                 android:id="@+id/editor"
                                 android:background="@android:color/transparent"
-                                android:layout_width="match_parent"
+                                android:layout_width="0dp"
                                 android:layout_height="wrap_content"
                                 android:text="@string/loading"
                                 android:hint=":3"
-                                android:layout_weight="1"/>
+                                android:layout_weight="1"
+                                android:fontFamily="monospace"/>
                         </LinearLayout>
                     </ScrollView>
                 </LinearLayout>
