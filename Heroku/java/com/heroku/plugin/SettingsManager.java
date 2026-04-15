@@ -155,10 +155,9 @@ public class SettingsManager {
         List<CustomProvider> providers = new ArrayList<>();
         String json = prefs.getString(KEY_CUSTOM_PROVIDERS, null);
         if (json == null) {
-            // Добавляем OpenRouter по умолчанию
-            providers.add(createOpenRouterPreset());
-            saveCustomProviders(providers);
-            return providers;
+            // Добавляем OpenRouter и OnlySQ по умолчанию
+            addDefaultProviders();
+            return loadCustomProviders(); // Рекурсивная загрузка после добавления
         }
         try {
             JSONArray array = new JSONArray(json);
@@ -186,6 +185,49 @@ public class SettingsManager {
         openrouter.setSupportsStreaming(true);
         openrouter.setDescription("Доступ к множеству моделей через единый API");
         return openrouter;
+    }
+    
+    /**
+     * Создаёт пресет OnlySQ.
+     * OnlySQ - российский AI-провайдер с поддержкой продвинутых моделей.
+     * API: https://api.onlysq.ru/ai/openai/
+     * Поддерживает режим рассуждений (reasoning) для моделей типа DeepSeek-R1.
+     */
+    public CustomProvider createOnlySQPreset() {
+        CustomProvider onlysq = new CustomProvider();
+        onlysq.setId("onlysq");
+        onlysq.setName("OnlySQ");
+        onlysq.setEndpoint("https://api.onlysq.ru/ai/openai");
+        onlysq.setApiKey("");
+        onlysq.setModel("gpt-4o-mini");
+        onlysq.setSupportsStreaming(true);
+        onlysq.setDescription("Российский AI-провайдер. Поддерживает DeepSeek-R1, Qwen и другие модели с режимом рассуждений.");
+        return onlysq;
+    }
+    
+    /**
+     * Добавляет новых провайдеров по умолчанию (OpenRouter и OnlySQ).
+     */
+    public void addDefaultProviders() {
+        List<CustomProvider> providers = loadCustomProviders();
+        boolean hasOpenRouter = false;
+        boolean hasOnlySQ = false;
+        
+        for (CustomProvider provider : providers) {
+            if ("openrouter".equals(provider.getId())) hasOpenRouter = true;
+            if ("onlysq".equals(provider.getId())) hasOnlySQ = true;
+        }
+        
+        if (!hasOpenRouter) {
+            providers.add(createOpenRouterPreset());
+        }
+        if (!hasOnlySQ) {
+            providers.add(createOnlySQPreset());
+        }
+        
+        if (!hasOpenRouter || !hasOnlySQ) {
+            saveCustomProviders(providers);
+        }
     }
     
     /**
@@ -246,9 +288,7 @@ public class SettingsManager {
      */
     public void resetToDefaults() {
         prefs.edit().clear().apply();
-        // Восстанавливаем пресет OpenRouter
-        List<CustomProvider> providers = new ArrayList<>();
-        providers.add(createOpenRouterPreset());
-        saveCustomProviders(providers);
+        // Восстанавливаем пресеты OpenRouter и OnlySQ
+        addDefaultProviders();
     }
 }

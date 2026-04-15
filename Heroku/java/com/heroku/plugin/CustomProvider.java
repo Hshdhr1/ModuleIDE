@@ -6,6 +6,7 @@ import org.json.JSONObject;
 /**
  * Модель пользовательского провайдера (OpenAI-совместимого).
  * Содержит все необходимые параметры для подключения к API.
+ * Поддерживает провайдеров: OpenRouter, OnlySQ, LocalAI, Ollama и другие.
  */
 public class CustomProvider {
     private String id;
@@ -15,69 +16,79 @@ public class CustomProvider {
     private String model;
     private boolean supportsStreaming;
     private String description;
-    
+    private String reasoningLevel; // Для OnlySQ: minimal, low, medium, high
+
     public CustomProvider() {
         this.supportsStreaming = true;
+        this.reasoningLevel = "medium"; // По умолчанию для OnlySQ
     }
-    
+
     // Геттеры и сеттеры
-    
+
     public String getId() {
         return id;
     }
-    
+
     public void setId(String id) {
         this.id = id;
     }
-    
+
     public String getName() {
         return name;
     }
-    
+
     public void setName(String name) {
         this.name = name;
     }
-    
+
     public String getEndpoint() {
         return endpoint;
     }
-    
+
     public void setEndpoint(String endpoint) {
         this.endpoint = endpoint;
     }
-    
+
     public String getApiKey() {
         return apiKey;
     }
-    
+
     public void setApiKey(String apiKey) {
         this.apiKey = apiKey;
     }
-    
+
     public String getModel() {
         return model;
     }
-    
+
     public void setModel(String model) {
         this.model = model;
     }
-    
+
     public boolean isSupportsStreaming() {
         return supportsStreaming;
     }
-    
+
     public void setSupportsStreaming(boolean supportsStreaming) {
         this.supportsStreaming = supportsStreaming;
     }
-    
+
     public String getDescription() {
         return description;
     }
-    
+
     public void setDescription(String description) {
         this.description = description;
     }
-    
+
+    public String getReasoningLevel() {
+        return reasoningLevel;
+    }
+
+    public void setReasoningLevel(String reasoningLevel) {
+        this.reasoningLevel = reasoningLevel;
+    }
+
     /**
      * Преобразует провайдер в JSONObject для сохранения.
      */
@@ -90,9 +101,10 @@ public class CustomProvider {
         json.put("model", model);
         json.put("supportsStreaming", supportsStreaming);
         json.put("description", description != null ? description : "");
+        json.put("reasoningLevel", reasoningLevel != null ? reasoningLevel : "medium");
         return json;
     }
-    
+
     /**
      * Создаёт провайдер из JSONObject.
      */
@@ -105,9 +117,10 @@ public class CustomProvider {
         provider.setModel(json.optString("model", ""));
         provider.setSupportsStreaming(json.optBoolean("supportsStreaming", true));
         provider.setDescription(json.optString("description", ""));
+        provider.setReasoningLevel(json.optString("reasoningLevel", "medium"));
         return provider;
     }
-    
+
     /**
      * Проверяет, заполнены ли все обязательные поля.
      */
@@ -116,7 +129,7 @@ public class CustomProvider {
                endpoint != null && !endpoint.isEmpty() &&
                apiKey != null && !apiKey.isEmpty();
     }
-    
+
     @Override
     public String toString() {
         return name + " (" + endpoint + ")";

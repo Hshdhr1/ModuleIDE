@@ -19,7 +19,7 @@ import org.json.JSONObject;
 
 /**
  * Сетевой сервис для работы с AI провайдерами.
- * Поддерживает Gemini и OpenAI-совместимые API (включая OpenRouter).
+ * Поддерживает Gemini, OpenRouter, OnlySQ и другие OpenAI-совместимые API.
  * Реализует потоковые и обычные запросы.
  */
 public class NetworkService {
@@ -463,6 +463,28 @@ public class NetworkService {
             if ("openrouter".equals(provider.getId())) {
                 requestBuilder.addHeader("HTTP-Referer", "https://github.com/heroku-plugin");
                 requestBuilder.addHeader("X-Title", "Heroku Plugin");
+            }
+            
+            // Для OnlySQ добавляем заголовок Authorization в формате API 2.0
+            if ("onlysq".equals(provider.getId())) {
+                // OnlySQ требует заголовок Authorization: Bearer apikey
+                // Уже добавлен выше, но можно добавить дополнительные параметры
+                // Поддержка режима рассуждений через extra_body
+            }
+            
+            // Добавляем поддержку reasoning для OnlySQ
+            JSONObject extraBody = new JSONObject();
+            if ("onlysq".equals(provider.getId())) {
+                // Режим рассуждений: minimal, low, medium, high
+                String reasoningLevel = provider.getReasoningLevel();
+                if (reasoningLevel == null || reasoningLevel.isEmpty()) {
+                    reasoningLevel = "medium";
+                }
+                extraBody.put("reasoning", reasoningLevel);
+            }
+            
+            if (extraBody.length() > 0) {
+                payload.put("extra_body", extraBody);
             }
             
             Request request = requestBuilder.build();
