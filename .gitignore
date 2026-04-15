@@ -1,4 +1,23 @@
-```
+
+
+# Compiled and build artifacts
+*.class
+*.o
+*.obj
+*.out
+build/
+target/
+
+# Dependencies
+__pycache__/
+.mypy_cache/
+.pytest_cache/
+node_modules/
+venv/
+.venv/
+.gradle/
+
+
 # Logs and temp files
 *.log
 *.tmp
@@ -7,11 +26,16 @@
 # Environment
 .env
 .env.local
+
 .env.*
+
+*.env.*
+
 
 # Editors
 .vscode/
 .idea/
+
 
 # Dependencies
 node_modules/
@@ -35,6 +59,8 @@ target/
 *.a
 *.obj
 *.out
+
+
 
 # System files
 .DS_Store
@@ -64,8 +90,10 @@ htmlcov/
 *.Z
 *.lz
 *.lzo
+
 *.tar.gz
 *.tar.bz2
 *.tar.xz
 *.tar.zst
-```
+
+
