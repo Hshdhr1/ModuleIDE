@@ -11,8 +11,11 @@ import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.text.TextUtils;
 import android.util.TypedValue;
+import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -101,6 +104,8 @@ public class EditActivity extends AppCompatActivity {
     private LinearLayout c0;
     private CoordinatorLayout d;
     private TextProcessor d0;
+    private TextView lineNumbersView;
+    private ImageView versionsManagerButton;
     private DrawerLayout e;
     private LinearLayout e0;
     private LinearLayout f0;
@@ -343,6 +348,34 @@ public class EditActivity extends AppCompatActivity {
         return MaterialColors.getColor(this, i, "getMaterialColor");
     }
 
+    private void openVersionsManager() {
+        this.P0.putExtra("position", getIntent().getStringExtra("position"));
+        this.P0.setClass(getApplicationContext(), VersionsControlActivity.class);
+        startActivity(this.P0);
+        overridePendingTransition(17432576, 17432577);
+    }
+
+    private void updateLineNumbers(CharSequence charSequence) {
+        if (this.lineNumbersView == null) {
+            return;
+        }
+        String charSequence2 = charSequence != null ? charSequence.toString() : "";
+        int i = 1;
+        for (int i2 = 0; i2 < charSequence2.length(); i2++) {
+            if (charSequence2.charAt(i2) == '\n') {
+                i++;
+            }
+        }
+        StringBuilder sb = new StringBuilder(i * 3);
+        for (int i3 = 1; i3 <= i; i3++) {
+            if (i3 > 1) {
+                sb.append('\n');
+            }
+            sb.append(i3);
+        }
+        this.lineNumbersView.setText(sb.toString());
+    }
+
     static /* bridge */ /* synthetic */ LinearLayout n(EditActivity editActivity) {
         return editActivity.u0;
     }
@@ -379,6 +412,14 @@ public class EditActivity extends AppCompatActivity {
         this.b0 = findViewById(2131231341);
         this.c0 = findViewById(2131231042);
         this.d0 = findViewById(2131230930);
+        int identifier = getResources().getIdentifier("lineNumbers", "id", getPackageName());
+        if (identifier != 0) {
+            this.lineNumbersView = findViewById(identifier);
+        }
+        int identifier2 = getResources().getIdentifier("HeaderButtonVersions", "id", getPackageName());
+        if (identifier2 != 0) {
+            this.versionsManagerButton = findViewById(identifier2);
+        }
         this.e0 = findViewById(2131231036);
         this.f0 = findViewById(2131231037);
         this.g0 = findViewById(2131231203);
@@ -422,6 +463,16 @@ public class EditActivity extends AppCompatActivity {
         this.T.setOnClickListener(new j2(this));
         this.U.setOnClickListener(new m2(this));
         this.V.setOnClickListener(new n2(this));
+        ImageView imageView = this.versionsManagerButton;
+        if (imageView != null) {
+            imageView.setColorFilter(m0(2130903278));
+            imageView.setOnClickListener(new View.OnClickListener() { // from class: ru.yufic.exteraPlugins.EditActivity.1
+                @Override // android.view.View.OnClickListener
+                public void onClick(View view) {
+                    EditActivity.this.openVersionsManager();
+                }
+            });
+        }
         this.X.setOnItemSelectedListener(new t2(this));
         this.g0.setOnClickListener(new u2(this));
         this.h0.setOnClickListener(new v2(this));
@@ -431,6 +482,21 @@ public class EditActivity extends AppCompatActivity {
         this.m0.setOnClickListener(new u0(this));
         this.n0.setOnClickListener(new v0(this));
         this.o0.setOnClickListener(new w0(this));
+        this.d0.addTextChangedListener(new TextWatcher() { // from class: ru.yufic.exteraPlugins.EditActivity.2
+            @Override // android.text.TextWatcher
+            public void afterTextChanged(Editable editable) {
+                EditActivity.this.updateLineNumbers(editable);
+            }
+
+            @Override // android.text.TextWatcher
+            public void beforeTextChanged(CharSequence charSequence, int i, int i2, int i3) {
+            }
+
+            @Override // android.text.TextWatcher
+            public void onTextChanged(CharSequence charSequence, int i, int i2, int i3) {
+            }
+        });
+        updateLineNumbers(this.d0.getText());
         this.O0 = new x0(this);
     }
 
